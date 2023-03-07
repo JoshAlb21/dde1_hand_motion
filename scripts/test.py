@@ -84,3 +84,88 @@ for concat_batch in concat_batches:
 df_aggregate = pd.concat([df_aggregate, pd.DataFrame(eigen_dict)], axis=1)
 
 print('Final df:', df_aggregate)
+
+#NEW
+
+
+#TODO write valid report function for mlp
+#NEW COPY TO SERVER
+# ALSO NEW save_history hist
+##TODO add eval_dict to every model
+'''
+data_report_mlp_base_raw = Report('mlp_raw', best_model, X_test_best, y_test_best, description=['MLP base', 'cv_data', 'raw features'])
+print(data_report_mlp_base_raw)
+precision_recall_multiclass(best_model, X_test_best, y_test_best)
+y_pred = best_model.predict(X_test_best)
+
+'''
+print(eval_dict)
+#plot_cm(y_test_best, y_pred)
+
+
+def boxplot_model_comparison(df_result:pd.DataFrame):
+    ax = sns.boxplot(data = f2_df, linewidth=1, showfliers=False)
+    ax.set_xticklabels(ax.get_xticklabels(),rotation=90)
+    sns.set(rc = {'figure.figsize':(8,10)})
+    ax.set(ylabel='F2-Score')
+    ax.set_title('F2-Score Deviation of different Models')
+
+
+    #Func1
+
+    # Without training
+hist = load_history('mlp_base_model_raw_cv0')
+plot_learning_curves(hist, hyperparams, 'test')
+eval_dict = load_eval_dict_pkl('mlp_base_model_raw_eval_dict')
+
+def plot_eval_dict_barplot_new(data):
+
+    # Extracting data
+    train_acc = data['train']['accuracy']
+    train_prec = data['train']['precision']
+    test_acc = data['test']['accuracy']
+    test_prec = data['test']['precision']
+
+    # Creating subplots for accuracy and precision
+    fig, axs = plt.subplots(2, 2, figsize=(15, 5))
+    bar_width = 0.2
+
+    # Plot for accuracy
+    axs[0][0].bar([i+bar_width/2 for i in range(len(train_acc))], train_acc, width=bar_width, color='b', label='Train Accuracy')
+    axs[0][0].bar([i-bar_width/2 for i in range(len(test_acc))], test_acc, width=bar_width, color='r', label='Test Accuracy')
+    axs[0][0].set_xticks(range(len(train_acc)))
+    axs[0][0].set_xticklabels([f'CV{i}' for i in range(len(train_acc))])
+    axs[0][0].set_ylabel('Accuracy')
+    axs[0][0].set_title('Accuracy')
+    axs[0][0].legend()
+
+    # Plot for precision
+    axs[0][1].bar([i+bar_width/2 for i in range(len(train_prec))], train_prec, width=bar_width, color='b', label='Train Precision')
+    axs[0][1].bar([i-bar_width/2 for i in range(len(test_prec))], test_prec, width=bar_width, color='r', label='Test Precision')
+    axs[0][1].set_xticks(range(len(train_prec)))
+    axs[0][1].set_xticklabels([f'CV{i}' for i in range(len(train_acc))])
+    axs[0][1].set_ylabel('Precision')
+    axs[0][1].set_title('Precision')
+    axs[0][1].legend()
+
+    # Plot for recall #TODO fix this
+    axs[1][0].bar([i+bar_width/2 for i in range(len(train_prec))], train_prec, width=bar_width, color='b', label='Train Precision')
+    axs[1][0].bar([i-bar_width/2 for i in range(len(test_prec))], test_prec, width=bar_width, color='r', label='Test Precision')
+    axs[1][0].set_xticks(range(len(train_prec)))
+    axs[1][0].set_xticklabels([f'CV{i}' for i in range(len(train_acc))])
+    axs[1][0].set_ylabel('Recall')
+    axs[1][0].set_title('Recall')
+    axs[1][0].legend()
+
+    # Plot for f1_score #TODO fix this
+    axs[1][1].bar([i+bar_width/2 for i in range(len(train_prec))], train_prec, width=bar_width, color='b', label='Train Precision')
+    axs[1][1].bar([i-bar_width/2 for i in range(len(test_prec))], test_prec, width=bar_width, color='r', label='Test Precision')
+    axs[1][1].set_xticks(range(len(train_prec)))
+    axs[1][1].set_xticklabels([f'CV{i}' for i in range(len(train_acc))])
+    axs[1][1].set_ylabel('F1 Score')
+    axs[1][1].set_title('F1 Score')
+    axs[1][1].legend()
+
+    plt.show()
+
+plot_eval_dict_barplot_new(eval_dict)
